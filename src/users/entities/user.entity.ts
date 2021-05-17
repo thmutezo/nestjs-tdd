@@ -1,1 +1,18 @@
-export class User {}
+import { ObjectID } from 'mongodb';
+
+export class User {
+  _id: ObjectID;
+  // _id: {
+  //   $oid: string;
+  // };
+  user_info: {
+    firstname: string;
+    initials: string;
+    surname: string;
+  };
+  username: string;
+  email: string;
+  password: string;
+  createdDate: string;
+  admin: boolean;
+}

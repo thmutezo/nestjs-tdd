@@ -7,4 +7,6 @@ export class CreateUserDto {
   username: string;
   email: string;
   password: string;
+  createdDate: string;
+  admin: boolean;
 }

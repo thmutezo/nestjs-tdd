@@ -1,0 +1,15 @@
+use('amnesty-test');
+// db.users.find({
+//   'user_info.firstname': 'Tafadzwa', 'user_info.initials': 't',
+// })
+db.users.aggregate([
+  {
+    $match: {
+      'user_info.firstname': "Tafadzwa",
+      'user_info.initials': 'H',
+      'user_info.surname': 'Mutezo',
+      email: 'fidwa16@gmail.com',
+      username: 'happy',
+    },
+  }
+])
