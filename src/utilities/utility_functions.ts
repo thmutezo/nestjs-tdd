@@ -1,5 +1,6 @@
 import { HttpException, HttpStatus } from '@nestjs/common';
 import { ObjectID } from 'mongodb';
+import { User } from './../users/entities/user.entity';
 
 const createObjectID = (id: string): ObjectID => {
   let userId: ObjectID;
@@ -11,4 +12,9 @@ const createObjectID = (id: string): ObjectID => {
   return userId;
 };
 
-export { createObjectID };
+const removePassword = (user: User): Partial<User> => {
+  const { password, ...returnedUser } = user;
+  return returnedUser;
+};
+
+export { createObjectID, removePassword };

@@ -1,26 +1,25 @@
+import * as dotenv from 'dotenv';
 import { Injectable } from '@nestjs/common';
-import { Db, MongoClient } from 'mongodb';
-import { ConfigService } from '@nestjs/config';
+import { MongoClient } from 'mongodb';
 
+dotenv.config();
 @Injectable()
 export class DatabaseService {
-  constructor(private readonly configService: ConfigService) {
-    this.connectDb();
-  }
-
-  async connectDb(): Promise<Db> {
-    try {
-      const client = await MongoClient.connect(
-        // 'mongodb+srv://testUser:testuser@test.37thw.mongodb.net/myFirstDatabase?retryWrites=true&w=majority',
-        this.configService.get<string>('TEST_DATABASE_CONNECTION'),
-        {
-          useUnifiedTopology: true,
-        },
-      );
-      //   return client.db('amnesty-test');
-      return client.db(this.configService.get<string>('TEST_DATABASE_NAME'));
-    } catch (e) {
-      throw e;
-    }
+  constructor() {
+    return (async () => {
+      try {
+        const client = await MongoClient.connect(
+          process.env.LOCAL_TEST_DATABASE_CONNECTION,
+          // this.configService.get<string>('LOCAL_TEST_DATABASE_CONNECTION'),
+          {
+            useUnifiedTopology: true,
+          },
+        );
+        return client.db(process.env.TEST_DATABASE_NAME);
+        // return client.db(this.configService.get<string>('TEST_DATABASE_NAME'));
+      } catch (e) {
+        throw e;
+      }
+    })();
   }
 }

@@ -1,7 +1,8 @@
 import * as dotenv from 'dotenv';
 import { Test, TestingModule } from '@nestjs/testing';
-import { Db, MongoClient, ObjectID } from 'mongodb';
+import { MongoClient, ObjectID } from 'mongodb';
 import { DatabaseModule } from '../database/database.module';
+import { DatabaseService } from '../database/database.service';
 import { UsersController } from './users.controller';
 import { UsersService } from './users.service';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -23,7 +24,7 @@ const newUserDTO: CreateUserDto = {
 const existingUserDto = {
   _id: new ObjectID('608c80e4e88ebb34f4dc93f3'),
   user_info: { firstname: 'Tafadzwa', initials: 'H', surname: 'Mutezo' },
-  username: 'happy',
+  username: 'tafa',
   email: 'fidwa16@gmail.com',
   password: 'happy123',
   createdDate: '1619820767206',
@@ -32,7 +33,7 @@ const existingUserDto = {
 
 const existingUsername = {
   user_info: { firstname: 'Tatenda', initials: 'H', surname: 'Chipuriro' },
-  username: 'happy',
+  username: 'tafa',
   email: 'fidwa@gmail.com',
   password: 'happy123',
   createdDate: Date.now().toString(),
@@ -55,50 +56,41 @@ const newUpdateUserDTO: CreateUserDto = {
 dotenv.config();
 describe('UsersController', () => {
   let controller: UsersController;
-  let client: MongoClient;
-  let database: Db | Promise<Db>;
   let updatedUserId: string;
 
-  beforeEach(async () => {
+  beforeAll(async () => {
     const module: TestingModule = await Test.createTestingModule({
       imports: [DatabaseModule],
-      controllers: [UsersController],
+      controllers: [UsersController, DatabaseService],
       providers: [UsersService],
-    })
-      .overrideProvider('DATABASE_CONNECTION')
-      .useFactory({
-        factory: async (): Promise<Db> => {
-          try {
-            client = await MongoClient.connect(
-              process.env.LOCAL_TEST_DATABASE_CONNECTION,
-              {
-                useUnifiedTopology: true,
-              },
-            );
-            database = client.db(process.env.TEST_DATABASE_NAME);
-            return database;
-          } catch (e) {
-            throw e;
-          }
-        },
-      })
-      .compile();
+    }).compile();
 
     controller = module.get<UsersController>(UsersController);
   });
+
   afterAll(async () => {
-    await client
-      .db('amnesty-test')
-      .collection('users')
-      .deleteMany({
-        _id: {
-          $nin: [
-            new ObjectID('608c80e4e88ebb34f4dc93f3'),
-            new ObjectID('608c912255d61d34d8d8adc9'),
-          ],
+    try {
+      const client = await MongoClient.connect(
+        process.env.LOCAL_TEST_DATABASE_CONNECTION,
+        {
+          useUnifiedTopology: true,
         },
-      });
-    await client.close();
+      );
+      await client
+        .db(process.env.TEST_DATABASE_NAME)
+        .collection('users')
+        .deleteMany({
+          _id: {
+            $nin: [
+              new ObjectID('608c80e4e88ebb34f4dc93f3'),
+              new ObjectID('608c912255d61d34d8d8adc9'),
+            ],
+          },
+        });
+      await client.close();
+    } catch (error) {
+      throw error;
+    }
   });
 
   describe('users controller', () => {
@@ -110,10 +102,11 @@ describe('UsersController', () => {
   describe('users/create', () => {
     it('should create and return new user', async () => {
       const createdUser = await controller.create(newUserDTO);
+      const { password, ...cleanedUserDTO } = newUserDTO;
       expect(createdUser).toBeTruthy();
       expect(createdUser).toStrictEqual({
         _id: expect.any(ObjectID),
-        ...newUserDTO,
+        ...cleanedUserDTO,
       });
     });
     it('should return error when creating existing user', async () => {
@@ -148,10 +141,10 @@ describe('UsersController', () => {
 
   describe('users/findOne', () => {
     it('should return user by ID', async () => {
-      const user = await controller.findOne('608c80e4e88ebb34f4dc93f3');
-      expect(user).not.toHaveLength(0);
-      expect(user[0]).toBeTruthy();
-      expect(user[0]).toEqual(existingUserDto);
+      const user = await controller.findOne(existingUserDto._id.toHexString());
+      const { password, ...cleanedUserDTO } = existingUserDto;
+      expect(user).toBeTruthy();
+      expect(user).toEqual(cleanedUserDTO);
     });
     it('should return error when no user is found', async () => {
       expect.assertions(1);
@@ -183,8 +176,8 @@ describe('UsersController', () => {
       const updatedUser = await controller.update(userId, {
         email: 'prayer@gmail.com',
       });
-      expect(updatedUser[0]).toBeTruthy();
-      expect(updatedUser[0]).toStrictEqual({
+      expect(updatedUser).toBeTruthy();
+      expect(updatedUser).toStrictEqual({
         ...user,
         email: 'prayer@gmail.com',
       });
