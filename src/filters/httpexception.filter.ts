@@ -28,20 +28,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
           : 'Internal server error',
     };
 
-    // if (status === HttpStatus.INTERNAL_SERVER_ERROR) {
-    //   Logger.error(
-    //     `Request {${request.url}, ${request.method}} route`,
-    //     exception.stack,
-    //     'Exception Filter',
-    //   );
-    // } else {
-    //   Logger.error(
-    //     `Request {${request.url}, ${request.method}} route`,
-    //     JSON.stringify(errorResponse),
-    //     'Exception Filter',
-    //   );
-    // }
-
     response.status(status).json(errorResponse);
   }
 }

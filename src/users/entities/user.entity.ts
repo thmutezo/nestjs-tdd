@@ -2,9 +2,6 @@ import { ObjectID } from 'mongodb';
 
 export class User {
   _id: ObjectID;
-  // _id: {
-  //   $oid: string;
-  // };
   user_info: {
     firstname: string;
     initials: string;

@@ -19,7 +19,6 @@ export class LoggerMiddleware implements NestMiddleware {
             : request.user.username;
       }
       const loggingMessage = `Request {URL:${url}, METHOD:${method}} Response {STATUS_CODE:${statusCode}, STATUS_MESSAGE:${statusMessage}, CONTENT_LENGTH:${contentLength}} Client {USERNAME:${username}, USER_AGENT:${userAgent}, I.P:${ip}}`;
-      // Logger.log(loggingMessage, 'Logger Middleware');
       statusCode >= 400 && statusCode <= 599
         ? Logger.error(loggingMessage, null, 'Logger Middleware')
         : Logger.log(loggingMessage, 'Logger Middleware');

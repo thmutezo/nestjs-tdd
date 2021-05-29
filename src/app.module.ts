@@ -9,7 +9,6 @@ import { JwtAuthGuard } from './guards/jwt_auth.guard';
 import { CaslModule } from './casl/casl.module';
 import { HttpExceptionFilter } from './filters/httpexception.filter';
 import { LoggerMiddleware } from './middleware/logger.middleware';
-import { UsersController } from './users/users.controller';
 import { JwtStrategy } from './auth/jwt.strategy';
 
 @Module({

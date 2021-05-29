@@ -1,7 +1,7 @@
 import * as dotenv from 'dotenv';
 import { Test, TestingModule } from '@nestjs/testing';
 import { UsersService } from './users.service';
-import { MongoClient, Db, ObjectID } from 'mongodb';
+import { MongoClient, ObjectID } from 'mongodb';
 import { DatabaseModule } from '../database/database.module';
 import { DatabaseService } from './../database/database.service';
 
